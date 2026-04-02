@@ -11,7 +11,7 @@ from .sensor import DeviceHandlerFactory
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS: list[str] = ["sensor", "switch"]
+PLATFORMS: list[str] = ["sensor", "switch", "binary_sensor"]
 
 
 async def async_setup_entry(hass, entry):

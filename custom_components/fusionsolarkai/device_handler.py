@@ -10,7 +10,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .const import DOMAIN
+from .const import DOMAIN, CONF_POLLING_INTERVAL, DEFAULT_POLLING_INTERVAL
 from .api.fusion_solar_py.client import FusionSolarClient
 from .api.fusion_solar_py.exceptions import (
     AuthenticationException,
@@ -41,7 +41,11 @@ class BaseDeviceHandler:
             _LOGGER,
             name=f"{self.device_name} FusionSolar Data",
             update_method=self._async_update_data,
-            update_interval=timedelta(seconds=15),
+            update_interval=timedelta(
+                seconds=self.entry.options.get(
+                    CONF_POLLING_INTERVAL, DEFAULT_POLLING_INTERVAL
+                )
+            ),
         )
         await coordinator.async_config_entry_first_refresh()
         return coordinator

@@ -1,3 +1,4 @@
+import logging
 from typing import Dict, Any, List
 
 from homeassistant.helpers.update_coordinator import (
@@ -15,14 +16,29 @@ from .const import (
 )
 
 
+_LOGGER = logging.getLogger(__name__)
+
+
 class ChargerDeviceHandler(BaseDeviceHandler):
     """Handler for Charger devices"""
 
     async def _async_get_data(self) -> Dict[str, Any]:
         async def fetch_charger_data(client):
-            return await self.hass.async_add_executor_job(
+            response = await self.hass.async_add_executor_job(
                 client.get_charger_data, self.device_id
             )
+
+            try:
+                alarm_data = await self.hass.async_add_executor_job(
+                    client.get_alarm_data, self.device_id
+                )
+            except Exception as e:
+                _LOGGER.warning("Failed to fetch alarm data for %s: %s", self.device_id, e)
+                alarm_data = {}
+
+            response["alarms"] = alarm_data
+
+            return response
 
         return await self._get_client_and_retry(fetch_charger_data)
 

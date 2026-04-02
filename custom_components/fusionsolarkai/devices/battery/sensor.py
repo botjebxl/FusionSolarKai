@@ -1,3 +1,4 @@
+import logging
 from typing import Dict, Any, List, Set
 import re
 
@@ -14,6 +15,9 @@ from .const import (
     BATTERY_STATUS_SIGNALS,
     MODULE_SIGNAL_MAP,
 )
+
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class BatteryDeviceHandler(BaseDeviceHandler):
@@ -35,7 +39,15 @@ class BatteryDeviceHandler(BaseDeviceHandler):
                 if stats:
                     module_data[module_id] = stats
 
-            return {"battery": response, "modules": module_data}
+            try:
+                alarm_data = await self.hass.async_add_executor_job(
+                    client.get_alarm_data, self.device_id
+                )
+            except Exception as e:
+                _LOGGER.warning("Failed to fetch alarm data for %s: %s", self.device_id, e)
+                alarm_data = {}
+
+            return {"battery": response, "modules": module_data, "alarms": alarm_data}
 
         return await self._get_client_and_retry(fetch_battery_data)
 

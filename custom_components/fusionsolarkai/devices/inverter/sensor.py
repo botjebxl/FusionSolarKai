@@ -1,3 +1,4 @@
+import logging
 from typing import Dict, Any, List, Set
 from datetime import date
 
@@ -15,6 +16,8 @@ from .const import (
     PV_SIGNALS,
     OPTIMIZER_METRICS,
 )
+
+_LOGGER = logging.getLogger(__name__)
 
 pv_inputs = {
     "pv1": {"voltage": "11001", "current": "11002"},
@@ -46,6 +49,16 @@ class InverterDeviceHandler(BaseDeviceHandler):
             )
 
             response["pv"] = pv_stats
+
+            try:
+                alarm_data = await self.hass.async_add_executor_job(
+                    client.get_alarm_data, self.device_id
+                )
+            except Exception as e:
+                _LOGGER.warning("Failed to fetch alarm data for %s: %s", self.device_id, e)
+                alarm_data = {}
+
+            response["alarms"] = alarm_data
 
             return response
 

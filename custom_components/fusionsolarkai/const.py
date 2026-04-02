@@ -9,6 +9,11 @@ CONF_DEVICE_TYPE = "device_type"
 CONF_DEVICE_ID = "device_id"
 CONF_DEVICE_NAME = "device_name"
 
+CONF_POLLING_INTERVAL = "polling_interval"
+DEFAULT_POLLING_INTERVAL = 60
+MIN_POLLING_INTERVAL = 15
+MAX_POLLING_INTERVAL = 300
+
 # Currency map (33 does not exist fsr)
 CURRENCY_MAP = {
     1: "CNY",

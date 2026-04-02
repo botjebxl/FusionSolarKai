@@ -8,6 +8,10 @@ from custom_components.fusionsolarkai.const import (
     CONF_PASSWORD,
     CONF_SUBDOMAIN,
     CONF_INSTALLER,
+    CONF_POLLING_INTERVAL,
+    DEFAULT_POLLING_INTERVAL,
+    MIN_POLLING_INTERVAL,
+    MAX_POLLING_INTERVAL,
     DOMAIN,
     CONF_DEVICE_TYPE,
     CONF_DEVICE_ID,
@@ -333,6 +337,17 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                             self.config_entry.data.get(CONF_INSTALLER),
                         ),
                     ): bool,
+                    vol.Optional(
+                        CONF_POLLING_INTERVAL,
+                        default=self.config_entry.options.get(
+                            CONF_POLLING_INTERVAL, DEFAULT_POLLING_INTERVAL
+                        ),
+                    ): vol.All(
+                        vol.Coerce(int),
+                        vol.Range(
+                            min=MIN_POLLING_INTERVAL, max=MAX_POLLING_INTERVAL
+                        ),
+                    ),
                 }
             ),
             description_placeholders={
