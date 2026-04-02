@@ -612,15 +612,18 @@ class FusionSolarClient:
             params={"_": round(time.time() * 1000)},
         )
 
-        # the new API returns a 500 exception if the subdomain is incorrect
-        if r.status_code == 500:
+        if r.status_code in (400, 500):
             try:
                 data = r.json()
+                exception_id = data.get("exceptionId", "")
 
-                if (
-                    data["exceptionId"] == "Query company failed."
-                    or data["exceptionId"] == "bad status"
-                ):
+                if exception_id in ("Query company failed.", "bad status"):
+                    _LOGGER.debug(
+                        "Company endpoint returned %s (%s) — this is normal for residential accounts",
+                        r.status_code,
+                        exception_id,
+                    )
+                else:
                     raise AuthenticationException(
                         "Invalid response received. Please check the correct Huawei subdomain."
                     )
@@ -628,26 +631,28 @@ class FusionSolarClient:
                 _LOGGER.error("Login validation failed. Failed to process response.")
                 _LOGGER.exception(e)
                 raise AuthenticationException("Failed to log into FusionSolarAPI.")
+        elif r.status_code >= 400:
+            r.raise_for_status()
 
-        r.raise_for_status()
+        if r.ok:
+            response_text = r.content.decode()
 
-        # catch an incorrect subdomain
-        response_text = r.content.decode()
+            if not response_text.strip().startswith('{"data":'):
+                raise AuthenticationException(
+                    "Invalid response received. Please check the correct Huawei subdomain."
+                )
 
-        if not response_text.strip().startswith('{"data":'):
-            raise AuthenticationException(
-                "Invalid response received. Please check the correct Huawei subdomain."
-            )
+            response_data = r.json()
 
-        response_data = r.json()
+            if "data" not in response_data:
+                _LOGGER.error(
+                    f"Failed to retrieve data object. {json.dumps(response_data)}"
+                )
+                raise AuthenticationException("Failed to login into FusionSolarAPI.")
 
-        if "data" not in response_data:
-            _LOGGER.error(
-                f"Failed to retrieve data object. {json.dumps(response_data)}"
-            )
-            raise AuthenticationException("Failed to login into FusionSolarAPI.")
-
-        self._company_id = r.json()["data"]["moDn"]
+            self._company_id = response_data["data"]["moDn"]
+        else:
+            self._company_id = None
 
         # get the roarand, which is needed for non-GET requests, thus to change device settings
         r = self._session.get(
