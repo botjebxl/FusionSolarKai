@@ -8,9 +8,9 @@
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/botjebxl/FusionSolarKai/issues",
   "requirements": [
-    "Pillow>=10.0.0,<12.0.0",
-    "beautifulsoup4>=4.12.0,<5.0.0",
-    "gradio_client>=1.5.0,<2.0.0"
+    "Pillow>=10.0.0",
+    "beautifulsoup4>=4.12.0",
+    "gradio_client>=1.5.0"
   ],
-  "version": "3.0.0"
+  "version": "3.0.1"
 }
