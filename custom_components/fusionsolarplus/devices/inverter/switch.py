@@ -113,32 +113,31 @@ class InverterPowerSwitch(CoordinatorEntity, SwitchEntity):
             return
 
         self._is_toggling = True
-        self._is_on = new_state  # Optimistically update the state
         self.async_write_ha_state()
 
         try:
-            success = await self.hass.async_add_executor_job(
+            response = await self.hass.async_add_executor_job(
                 self._client.toggle_device,
                 self._device_id,
                 signal,
                 self._password,
                 "0",
             )
-            if success:
+            if isinstance(response, dict) and response.get("success"):
+                self._is_on = new_state
                 _LOGGER.info(
                     "Successfully sent turn %s command to inverter.",
                     "on" if new_state else "off",
                 )
             else:
                 _LOGGER.error(
-                    "Failed to send turn %s command to inverter.",
+                    "Failed to send turn %s command to inverter. Response: %s",
                     "on" if new_state else "off",
+                    response,
                 )
-                self._is_on = not new_state
 
         except Exception as e:
             _LOGGER.error("An error occurred while toggling inverter: %s", e)
-            self._is_on = not new_state
         finally:
             # Start cooldown period
             await asyncio.sleep(30)

@@ -4,12 +4,20 @@ from datetime import timedelta
 from functools import partial
 from typing import Dict, Any
 
+import requests.exceptions
+
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import DOMAIN
 from .api.fusion_solar_py.client import FusionSolarClient
+from .api.fusion_solar_py.exceptions import (
+    AuthenticationException,
+    CaptchaRequiredException,
+    FusionSolarException,
+    FusionSolarRateLimit,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -24,6 +32,7 @@ class BaseDeviceHandler:
         self.device_id = entry.data.get("device_id")
         self.device_name = entry.data.get("device_name")
         self.device_type = entry.data.get("device_type")
+        self._consecutive_failures = 0
 
     async def create_coordinator(self) -> DataUpdateCoordinator:
         """Create and return a data update coordinator"""
@@ -31,11 +40,28 @@ class BaseDeviceHandler:
             self.hass,
             _LOGGER,
             name=f"{self.device_name} FusionSolar Data",
-            update_method=self._async_get_data,
+            update_method=self._async_update_data,
             update_interval=timedelta(seconds=15),
         )
         await coordinator.async_config_entry_first_refresh()
         return coordinator
+
+    async def _async_update_data(self) -> Dict[str, Any]:
+        """Wrap _async_get_data with consecutive failure tracking."""
+        try:
+            data = await self._async_get_data()
+            self._consecutive_failures = 0
+            return data
+        except Exception:
+            self._consecutive_failures += 1
+            if self._consecutive_failures >= 3:
+                _LOGGER.warning(
+                    "%s: %d consecutive update failures — check credentials, "
+                    "network connectivity, or FusionSolar service status",
+                    self.device_name,
+                    self._consecutive_failures,
+                )
+            raise
 
     async def _get_client_and_retry(self, operation_func):
         client = self.hass.data[DOMAIN][self.entry.entry_id]
@@ -59,7 +85,13 @@ class BaseDeviceHandler:
                     if not is_active:
                         raise Exception("Login completed but session still not active")
                 return True
-            except Exception:
+            except (AuthenticationException, CaptchaRequiredException) as err:
+                _LOGGER.error(
+                    "Credential/captcha problem during login: %s", err
+                )
+                return False
+            except Exception as err:
+                _LOGGER.warning("Failed to ensure logged in: %s", err)
                 return False
 
         async def create_new_client():
@@ -79,6 +111,11 @@ class BaseDeviceHandler:
 
         if not await ensure_logged_in(client):
             client = await create_new_client()
+            if client is None:
+                raise Exception(
+                    "Failed to create a new FusionSolar client — "
+                    "check credentials and network connectivity"
+                )
 
         max_retries = 2
         for attempt in range(max_retries + 1):
@@ -87,7 +124,20 @@ class BaseDeviceHandler:
                 if response is None:
                     raise Exception("API returned None response")
                 return response
+            except (AuthenticationException, CaptchaRequiredException) as err:
+                _LOGGER.warning(
+                    "Non-retryable credential/captcha error: %s", err
+                )
+                raise
+            except requests.exceptions.SSLError as err:
+                _LOGGER.warning(
+                    "SSL error (possible MITM), not retrying: %s", err
+                )
+                raise
             except Exception as err:
+                _LOGGER.warning(
+                    "Attempt %d/%d failed: %s", attempt + 1, max_retries + 1, err
+                )
                 if attempt < max_retries:
                     recovery_success = False
                     try:
@@ -96,15 +146,29 @@ class BaseDeviceHandler:
                             client.is_session_active
                         ):
                             recovery_success = True
-                    except Exception:
-                        pass
+                    except (AuthenticationException, CaptchaRequiredException) as login_err:
+                        _LOGGER.warning(
+                            "Credential/captcha error during recovery login: %s",
+                            login_err,
+                        )
+                    except Exception as login_err:
+                        _LOGGER.warning(
+                            "Recovery login failed: %s", login_err
+                        )
 
                     if not recovery_success:
                         try:
                             client = await create_new_client()
-                            recovery_success = True
-                        except Exception:
-                            pass
+                            if client is not None:
+                                recovery_success = True
+                            else:
+                                _LOGGER.warning(
+                                    "Recovery client creation returned None"
+                                )
+                        except Exception as create_err:
+                            _LOGGER.warning(
+                                "Recovery client creation failed: %s", create_err
+                            )
 
                     if recovery_success:
                         await asyncio.sleep(2)

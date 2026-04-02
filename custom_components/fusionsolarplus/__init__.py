@@ -1,8 +1,11 @@
 import logging
-from homeassistant.helpers.device_registry import async_get as async_get_device_registry
-from .api.fusion_solar_py.client import FusionSolarClient
 from functools import partial
 
+from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
+from homeassistant.helpers.device_registry import async_get as async_get_device_registry
+
+from .api.fusion_solar_py.client import FusionSolarClient
+from .api.fusion_solar_py.exceptions import AuthenticationException, CaptchaRequiredException
 from .const import DOMAIN
 from .sensor import DeviceHandlerFactory
 
@@ -18,15 +21,24 @@ async def async_setup_entry(hass, entry):
     password = entry.options.get("password", entry.data["password"])
     subdomain = entry.options.get("subdomain", entry.data.get("subdomain", "uni001eu5"))
 
-    client = await hass.async_add_executor_job(
-        partial(
-            FusionSolarClient,
-            username,
-            password,
-            captcha_model_path=hass,
-            huawei_subdomain=subdomain,
+    try:
+        client = await hass.async_add_executor_job(
+            partial(
+                FusionSolarClient,
+                username,
+                password,
+                captcha_model_path=hass,
+                huawei_subdomain=subdomain,
+            )
         )
-    )
+    except (AuthenticationException, CaptchaRequiredException) as err:
+        raise ConfigEntryAuthFailed(
+            f"Authentication failed: {err}"
+        ) from err
+    except Exception as err:
+        raise ConfigEntryNotReady(
+            f"Failed to connect to FusionSolar: {err}"
+        ) from err
 
     if DOMAIN not in hass.data:
         hass.data[DOMAIN] = {}
@@ -78,6 +90,15 @@ async def async_unload_entry(hass, entry):
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
 
     if unload_ok:
+        client = hass.data[DOMAIN].get(entry.entry_id)
+        if client is not None:
+            try:
+                await hass.async_add_executor_job(client.log_out)
+            except Exception as err:
+                _LOGGER.warning(
+                    "Failed to log out FusionSolar client on unload: %s", err
+                )
+
         hass.data[DOMAIN].pop(f"{entry.entry_id}_coordinator", None)
         hass.data[DOMAIN].pop(f"{entry.entry_id}_sensor_handler", None)
         hass.data[DOMAIN].pop(entry.entry_id, None)

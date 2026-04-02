@@ -1,3 +1,4 @@
+import logging
 from typing import Dict, Any, List
 
 from homeassistant.helpers.update_coordinator import (
@@ -10,6 +11,8 @@ from homeassistant.components.sensor import ENTITY_ID_FORMAT
 
 from ...device_handler import BaseDeviceHandler
 from .const import BACKUPBOX_SIGNALS
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class BackupBoxDeviceHandler(BaseDeviceHandler):
@@ -121,8 +124,10 @@ class FusionSolarBackupBoxSensor(CoordinatorEntity, SensorEntity):
             self._last_value = value
             return value
 
-        except Exception:
-            # Safe fallback on any parsing error
+        except (KeyError, TypeError, ValueError, IndexError) as exc:
+            _LOGGER.warning(
+                "Error parsing data for sensor '%s': %s", self._attr_name, exc
+            )
             return self._last_value
 
     @property

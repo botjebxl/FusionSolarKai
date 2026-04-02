@@ -50,12 +50,11 @@ def encrypt_password(key_data: dict, password: str) -> str:
         )
         raise FusionSolarException("Invalid 'key_data' parameter passed.")
 
-    # make sure the encryption was enabled, if not, simply return the non-encrypted password
+    # refuse to transmit plaintext passwords — a MITM could forge enableEncrypt: false
     if not key_data["enableEncrypt"]:
-        _LOGGER.warn(
-            "Password encryption called even though encryption is not enabled. Returning non-encrypted password"
+        raise FusionSolarException(
+            "Server requested plaintext password transmission, which is not allowed for security reasons"
         )
-        return password
 
     # load the public key
     try:

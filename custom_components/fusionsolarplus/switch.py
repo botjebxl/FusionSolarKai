@@ -62,3 +62,4 @@ async def async_setup_entry(
 
     except Exception as e:
         _LOGGER.error("Failed to set up switches for device %s: %s", device_name, e)
+        raise
