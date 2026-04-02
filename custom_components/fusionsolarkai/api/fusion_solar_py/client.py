@@ -982,7 +982,14 @@ class FusionSolarClient:
 
         devices = []
         for device in device_data["data"]:
-            devices += [dict(type=device["mocTypeName"], deviceDn=device["dn"])]
+            devices += [
+                dict(
+                    type=device.get("mocTypeName"),
+                    deviceDn=device.get("dn"),
+                    mocType=device.get("mocType"),
+                    name=device.get("devName") or device.get("name"),
+                )
+            ]
 
         return devices
 

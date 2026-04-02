@@ -44,6 +44,26 @@ DEVICE_TYPE_OPTIONS = {
     "BackupBox": DEVICE_TYPE_BACKUPBOX,
 }
 
+CHARGER_MOC_TYPE = "60080"
+
+
+def _normalize_moc_type(value):
+    """Normalize FusionSolar mocType values for reliable comparisons."""
+    if value is None:
+        return None
+    return str(value).strip()
+
+
+def _is_charger_device(device):
+    """Match charger devices across localized names and API variants."""
+    if _normalize_moc_type(device.get("mocType")) == CHARGER_MOC_TYPE:
+        return True
+
+    device_type = str(device.get("type") or "").strip().lower()
+    return any(
+        token in device_type for token in ("charging pile", "charger", "charging")
+    )
+
 
 class FusionSolarKaiConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     device_options = {}
@@ -185,7 +205,7 @@ class FusionSolarKaiConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         self.client.get_device_ids
                     )
                     for device in response:
-                        if device["type"] == "Charging Pile":
+                        if _is_charger_device(device):
                             device_dn = device["deviceDn"]
                             device_options[f"Charger (ID: {device_dn})"] = device_dn
 
@@ -237,6 +257,19 @@ class FusionSolarKaiConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                             device_options[f"BackupBox (ID: {device_dn})"] = device_dn
 
                 if not device_options:
+                    if self.device_type == DEVICE_TYPE_CHARGER:
+                        _LOGGER.warning(
+                            "FusionSolarKai: No charger devices matched. Available devices: %s",
+                            [
+                                {
+                                    "type": device.get("type"),
+                                    "mocType": device.get("mocType"),
+                                    "deviceDn": device.get("deviceDn"),
+                                    "name": device.get("name"),
+                                }
+                                for device in response
+                            ],
+                        )
                     _LOGGER.warning(
                         "FusionSolarKai: No matching devices found for type: %s",
                         self.device_type,
