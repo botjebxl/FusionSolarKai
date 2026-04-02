@@ -28,11 +28,12 @@
     "error": {
       "invalid_auth": "Invalid username or password.",
       "fetch_error": "Failed to fetch devices.",
-      "rate_limit": "Captcha API rate limited, please try again in 24 hours.",
+      "rate_limit": "Captcha API rate limited, please try again in 6 hours.",
       "unknown": "Unknown error occurred."
     },
     "abort": {
-      "fetch_error": "Could not fetch device list from FusionSolar."
+      "fetch_error": "Could not fetch device list from FusionSolar.",
+      "no_devices": "No devices found on your FusionSolar account."
     }
   },
   "options": {

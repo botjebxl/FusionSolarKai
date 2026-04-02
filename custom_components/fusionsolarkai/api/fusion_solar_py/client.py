@@ -1225,7 +1225,7 @@ class FusionSolarClient:
             "dataType": "CURRENT",
             "domainType": "OC_SOLAR",
             "pageNo": 1,
-            "pageSize": 10,
+            "pageSize": 100,
             "nativeMeDn": device_dn,
         }
         r = self._session.post(url=url, json=request_data)

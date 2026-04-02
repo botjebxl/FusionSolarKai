@@ -64,9 +64,17 @@ async def async_setup_entry(hass, entry):
 
         hass.data[DOMAIN][f"{entry.entry_id}_coordinator"] = coordinator
         hass.data[DOMAIN][f"{entry.entry_id}_sensor_handler"] = sensor_handler
+    except ConfigEntryAuthFailed:
+        hass.data[DOMAIN].pop(f"{entry.entry_id}_device_info", None)
+        hass.data[DOMAIN].pop(entry.entry_id, None)
+        raise
     except Exception as e:
         _LOGGER.error("Failed to create coordinator for device %s: %s", device_name, e)
-        return False
+        hass.data[DOMAIN].pop(f"{entry.entry_id}_device_info", None)
+        hass.data[DOMAIN].pop(entry.entry_id, None)
+        raise ConfigEntryNotReady(
+            f"Failed to set up device {device_name}: {e}"
+        ) from e
 
     device_registry = async_get_device_registry(hass)
     device_registry.async_get_or_create(

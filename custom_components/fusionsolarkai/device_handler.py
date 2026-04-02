@@ -8,6 +8,7 @@ import requests.exceptions
 
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import DOMAIN, CONF_POLLING_INTERVAL, DEFAULT_POLLING_INTERVAL
@@ -56,6 +57,11 @@ class BaseDeviceHandler:
             data = await self._async_get_data()
             self._consecutive_failures = 0
             return data
+        except (AuthenticationException, CaptchaRequiredException) as err:
+            self._consecutive_failures += 1
+            raise ConfigEntryAuthFailed(
+                f"Authentication failed: {err}"
+            ) from err
         except Exception:
             self._consecutive_failures += 1
             if self._consecutive_failures >= 3:
@@ -89,11 +95,8 @@ class BaseDeviceHandler:
                     if not is_active:
                         raise Exception("Login completed but session still not active")
                 return True
-            except (AuthenticationException, CaptchaRequiredException) as err:
-                _LOGGER.error(
-                    "Credential/captcha problem during login: %s", err
-                )
-                return False
+            except (AuthenticationException, CaptchaRequiredException):
+                raise
             except Exception as err:
                 _LOGGER.warning("Failed to ensure logged in: %s", err)
                 return False

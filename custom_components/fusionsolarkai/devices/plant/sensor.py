@@ -50,12 +50,10 @@ class PlantDeviceHandler(BaseDeviceHandler):
             if signal.get("meter_required", False) and not exist_meter:
                 continue
 
-            # Skip creation if the signal is a flow signal and the value is None
-            if (
-                signal["key"].startswith("flow_")
-                and coordinator.data.get(signal["key"]) is None
-            ):
-                continue
+            # Always create flow sensors even if value is None on first fetch.
+            # They will show as unavailable/unknown until data arrives, which
+            # is the correct HA behavior and avoids missing entities when the
+            # first snapshot happens at night or during a partial API response.
 
             entities.append(
                 FusionSolarPlantSensor(

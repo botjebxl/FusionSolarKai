@@ -45,7 +45,7 @@ DEVICE_TYPE_OPTIONS = {
 }
 
 
-class FusionSolarPlusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+class FusionSolarKaiConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     device_options = {}
 
     def __init__(self):
@@ -83,19 +83,19 @@ class FusionSolarPlusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 )
             except AuthenticationException as auth_exc:
                 _LOGGER.warning(
-                    "FusionSolarPlus: Invalid authentication credentials - %s",
+                    "FusionSolarKai: Invalid authentication credentials - %s",
                     str(auth_exc),
                 )
                 errors["base"] = "invalid_auth"
             except FusionSolarRateLimit as rate_limit_exc:
                 _LOGGER.warning(
-                    "FusionSolarPlus: Captcha solver API rate limited, please try again later.",
+                    "FusionSolarKai: Captcha solver API rate limited, please try again later.",
                     str(rate_limit_exc),
                 )
                 errors["base"] = "rate_limit"
             except Exception as e:
                 _LOGGER.warning(
-                    "FusionSolarPlus: Unexpected error during authentication: %s",
+                    "FusionSolarKai: Unexpected error during authentication: %s",
                     str(e),
                 )
                 errors["base"] = "unknown"
@@ -137,7 +137,7 @@ class FusionSolarPlusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             ),
             errors=errors,
             description_placeholders={
-                "disclaimer_url": "https://github.com/JortvanSchijndel/FusionSolarPlus/blob/master/installer_disclaimer.md"
+                "disclaimer_url": "https://github.com/botjebxl/FusionSolarKai/blob/master/installer_disclaimer.md"
             },
         )
 
@@ -238,7 +238,7 @@ class FusionSolarPlusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
                 if not device_options:
                     _LOGGER.warning(
-                        "FusionSolarPlus: No matching devices found for type: %s",
+                        "FusionSolarKai: No matching devices found for type: %s",
                         self.device_type,
                     )
                     return self.async_abort(reason="no_devices")
@@ -247,7 +247,7 @@ class FusionSolarPlusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             except Exception as e:
                 _LOGGER.warning(
-                    "FusionSolarPlus: Exception while fetching device list: %s", e
+                    "FusionSolarKai: Exception while fetching device list: %s", e
                 )
                 return self.async_abort(reason="fetch_error")
 
@@ -351,6 +351,6 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 }
             ),
             description_placeholders={
-                "disclaimer_url": "https://github.com/JortvanSchijndel/FusionSolarPlus/blob/master/installer_disclaimer.md"
+                "disclaimer_url": "https://github.com/botjebxl/FusionSolarKai/blob/master/installer_disclaimer.md"
             },
         )

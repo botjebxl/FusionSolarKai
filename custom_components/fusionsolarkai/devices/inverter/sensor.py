@@ -98,12 +98,20 @@ class InverterDeviceHandler(BaseDeviceHandler):
 
         pv_data = coordinator.data.get("pv", {})
 
-        signals = pv_data.get("signals", {})
-        pv_lookup = {
-            signal_id: signal_data.get("value")
-            for signal_id, signal_data in signals.items()
-        }
         available_pvs = {pv.lower() for pv in pv_data.get("available_pvs", [])}
+
+        # If the API returned no available_pvs (e.g. inverter offline at first
+        # fetch, partial API response), fall back to PV1-PV4 which covers most
+        # residential installations. Entities for non-existent PV inputs will
+        # simply show as unavailable, which is the correct HA behavior. The
+        # alternative -- creating zero PV entities -- is worse because they'd
+        # be permanently missing until a reload.
+        if not available_pvs:
+            _LOGGER.debug(
+                "No available_pvs in first snapshot for %s, defaulting to PV1-PV4",
+                self.device_id,
+            )
+            available_pvs = {"pv1", "pv2", "pv3", "pv4"}
 
         signals_to_input = {
             "PV1": ("11001", "11002", "11003"),
@@ -142,8 +150,9 @@ class InverterDeviceHandler(BaseDeviceHandler):
                 if not pv_signal:
                     continue
 
-                if sig_id not in pv_lookup or pv_lookup[sig_id] is None:
-                    continue
+                # Don't skip PV signals with missing values -- create the entity
+                # anyway so it shows as unavailable/unknown. This avoids missing
+                # entities when the first snapshot has no PV data (e.g. at night).
 
                 unique_id = f"{list(self.device_info['identifiers'])[0][1]}_pv_{sig_id}"
                 if unique_id in unique_ids:
@@ -165,7 +174,14 @@ class InverterDeviceHandler(BaseDeviceHandler):
     def _create_optimizer_entities(
         self, coordinator: DataUpdateCoordinator, entities: List, unique_ids: Set[str]
     ):
-        """Create optimizer entities"""
+        """Create optimizer entities.
+
+        Note: Unlike PV entities, optimizer entities are intentionally only
+        created when the optimizer data is present in the snapshot. Optimizers
+        are discovered by serial number from the API -- there is no fixed set
+        to fall back to, so we cannot create placeholder entities without
+        knowing which optimizers exist.
+        """
         if not coordinator.data:
             return
 

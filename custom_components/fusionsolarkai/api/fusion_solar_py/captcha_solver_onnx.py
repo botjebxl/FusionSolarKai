@@ -12,12 +12,30 @@ remote Gradio API instead.
 
 import time
 import logging
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 
 from .exceptions import FusionSolarException, FusionSolarRateLimit
 
 _LOGGER = logging.getLogger(__name__)
 
 _GRADIO_TIMEOUT = 30  # seconds – total budget for Client() + predict()
+
+
+def _run_with_timeout(func, timeout_seconds=_GRADIO_TIMEOUT):
+    """Run *func* in a separate thread with a hard timeout.
+
+    This replaces the old signal.SIGALRM approach which only works in the
+    main thread.  Home Assistant calls us from a thread-pool worker, so
+    we need a threading-safe timeout mechanism.
+    """
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(func)
+        try:
+            return future.result(timeout=timeout_seconds)
+        except FuturesTimeoutError:
+            raise FusionSolarException(
+                f"Captcha solving timed out after {timeout_seconds} seconds"
+            )
 
 
 class Solver(object):
@@ -38,7 +56,6 @@ class Solver(object):
 
         import tempfile
         import os
-        import signal
 
         tmp_path = None
 
@@ -53,24 +70,14 @@ class Solver(object):
                 len(img_bytes),
             )
 
-            # Enforce a hard timeout on the external Gradio call.
-            def _timeout_handler(signum, frame):
-                raise FusionSolarException(
-                    f"Captcha Gradio API call timed out after {_GRADIO_TIMEOUT}s"
-                )
-
-            old_handler = signal.signal(signal.SIGALRM, _timeout_handler)
-            signal.alarm(_GRADIO_TIMEOUT)
-
-            try:
+            def _do_predict():
                 client = Client("Nischay103/captcha_recognition")
-                result = client.predict(
+                return client.predict(
                     input=handle_file(tmp_path),
                     api_name="/predict",
                 )
-            finally:
-                signal.alarm(0)
-                signal.signal(signal.SIGALRM, old_handler)
+
+            result = _run_with_timeout(_do_predict)
 
             # Validate the response
             if not isinstance(result, str) or not result.strip():

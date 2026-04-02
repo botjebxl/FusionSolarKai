@@ -58,27 +58,26 @@ class ChargerDeviceHandler(BaseDeviceHandler):
             if not signal_list:
                 continue
 
+            # Create entities for all signals in the determined signal list,
+            # regardless of whether the signal ID is present in the current
+            # snapshot. This avoids missing entities when the first fetch has
+            # a partial response. Entities will show as unavailable/unknown
+            # when their data is missing, which is the correct HA behavior.
             for signal_config in signal_list:
-                matching_signal = next(
-                    (s for s in signals_data if s.get("id") == signal_config["id"]),
-                    None,
-                )
-
-                if matching_signal:
-                    unique_id = f"{list(self.device_info['identifiers'])[0][1]}_{signal_type_id}_{signal_config['id']}"
-                    if unique_id not in unique_ids:
-                        entity = FusionSolarChargerSensor(
-                            coordinator,
-                            signal_config["id"],
-                            signal_config.get("custom_name", signal_config["name"]),
-                            signal_config.get("unit", None),
-                            self.device_info,
-                            signal_config.get("device_class"),
-                            signal_config.get("state_class"),
-                            signal_type_id,
-                        )
-                        entities.append(entity)
-                        unique_ids.add(unique_id)
+                unique_id = f"{list(self.device_info['identifiers'])[0][1]}_{signal_type_id}_{signal_config['id']}"
+                if unique_id not in unique_ids:
+                    entity = FusionSolarChargerSensor(
+                        coordinator,
+                        signal_config["id"],
+                        signal_config.get("custom_name", signal_config["name"]),
+                        signal_config.get("unit", None),
+                        self.device_info,
+                        signal_config.get("device_class"),
+                        signal_config.get("state_class"),
+                        signal_type_id,
+                    )
+                    entities.append(entity)
+                    unique_ids.add(unique_id)
 
         return entities
 
