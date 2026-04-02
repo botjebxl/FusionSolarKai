@@ -7,7 +7,7 @@ Checklist
 -->
 
 
-# 🚀 FusionSolarPlus vx.x.x Release Notes
+# 🚀 FusionSolarKai vx.x.x Release Notes
 
 ## ⚠️ Breaking Change
 

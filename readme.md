@@ -1,31 +1,39 @@
 # FusionSolarKai
 
-A security-hardened fork of [FusionSolarPlus](https://github.com/JortvanSchijndel/FusionSolarPlus) by [@JortvanSchijndel](https://github.com/JortvanSchijndel).
+A security-focused Home Assistant integration for Huawei FusionSolar systems. Monitor your solar plant, inverters, batteries, power sensors, chargers, and more — directly from the FusionSolar cloud API. No northbound API, OpenAPI, or kiosk URL required.
 
-> **Acknowledgement**: This project is built on the excellent work of Jort van Schijndel and the FusionSolarPlus contributors. The original integration reverse-engineered the Huawei FusionSolar API and built a fully featured Home Assistant integration around it. FusionSolarKai exists to apply security hardening on top of that foundation. Thank you to the original authors for making this possible.
+> **Credit**: Originally based on [FusionSolarPlus](https://github.com/JortvanSchijndel/FusionSolarPlus) by [@JortvanSchijndel](https://github.com/JortvanSchijndel). FusionSolarKai has since been independently developed with a focus on security hardening, improved error handling, and additional features.
 
 ___
 
-This integration brings full FusionSolar support to Home Assistant, with entities for plants, inverters, and more. It authenticates using your FusionSolar username and password. No northbound API, OpenAPI, or kiosk URL required.
+## What's different?
+
+- Hardened authentication flow (SSRF protection, encryption downgrade prevention, redirect validation)
+- Proper error surfacing to Home Assistant (reauth prompts, retry-on-failure, no silent swallowing)
+- Alarm monitoring via binary sensors on every device
+- Configurable polling interval (15–300 seconds)
+- Pinned dependencies and supply chain improvements
+- All entities created on startup regardless of time of day
 
 ## Setup
-Click the button below and download the FusionSolarPlus integration.
 
 <a href="https://my.home-assistant.io/redirect/hacs_repository/?owner=botjebxl&repository=FusionSolarKai&category=Integration" target="_blank" rel="noreferrer noopener"><img src="https://my.home-assistant.io/badges/hacs_repository.svg" alt="Open your Home Assistant instance and open a repository inside the Home Assistant Community Store." /></a>
 
+Or add manually in HACS: **Custom repositories** → `botjebxl/FusionSolarKai` → Category: Integration.
+
 Once installed:
 
-1. Restart Home Assistant and head over to **Settings » Devices & Services.**  
-2. Click on **"Add Integration."**  
-3. Search for **"FusionSolarPlus."**  
-4. Enter your FusionSolar username, password and subdomain.
-5. Select the device type you want to add, then choose the specific device.
+1. Restart Home Assistant and go to **Settings → Devices & Services**
+2. Click **Add Integration**
+3. Search for **"FusionSolarKai"**
+4. Enter your FusionSolar username, password, and subdomain
+5. Select the device type you want to add, then choose the specific device
 
-Repeat step 2 - 5 for each of the devices you want to add.
+Repeat steps 2–5 for each device you want to monitor.
 
 # Energy Dashboard
 
-FusionSolarPlus is fully compatible with the integrated Home Assistant energy dashboard. Please make sure you’ve already added the correct device types (See step 2-5 above). 
+FusionSolarKai is fully compatible with the Home Assistant energy dashboard. Make sure you’ve added the relevant device types first (see setup steps above).
 
 When configuring the energy dashboard you need to provide the following settings:
 
@@ -1262,12 +1270,11 @@ When configuring the energy dashboard you need to provide the following settings
 </details>
 
 # Issues
-If you encounter any problems while using the integration, please [open an issue](https://github.com/JortvanSchijndel/FusionSolarPlus/issues).
-Be sure to include as much relevant information as possible, this helps with troubleshooting and speeds up the resolution process.
+If you encounter any problems, please [open an issue](https://github.com/botjebxl/FusionSolarKai/issues) with as much detail as possible.
 
 # Development
 
-To contribute or run FusionSolarPlus locally, follow these steps:
+To contribute or run FusionSolarKai locally:
 
 1. **Install VS Code:**  
    [Download and install Visual Studio Code](https://code.visualstudio.com/).
@@ -1277,7 +1284,7 @@ To contribute or run FusionSolarPlus locally, follow these steps:
 
 3. **Clone the repository:**
    ```bash
-   git clone https://github.com/JortvanSchijndel/FusionSolarPlus.git && cd FusionSolarPlus
+   git clone https://github.com/botjebxl/FusionSolarKai.git && cd FusionSolarKai
    ```
 
 4. **Copy the dev container configuration:**

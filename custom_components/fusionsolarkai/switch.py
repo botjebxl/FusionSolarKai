@@ -1,4 +1,4 @@
-"""Switch platform for FusionSolar Plus."""
+"""Switch platform for FusionSolarKai."""
 
 import logging
 from typing import Dict, Any
