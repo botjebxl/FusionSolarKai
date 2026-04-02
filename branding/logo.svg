@@ -1,0 +1,52 @@
+<svg width="960" height="240" viewBox="0 0 960 240" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="logoTitle logoDesc">
+  <title id="logoTitle">FusionSolarKai logo</title>
+  <desc id="logoDesc">A blue solar energy emblem with a sun and lightning bolt, followed by the text FusionSolarKai.</desc>
+  <defs>
+    <linearGradient id="coreGlow" x1="38" y1="34" x2="182" y2="198" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#78A4FF"/>
+      <stop offset="0.58" stop-color="#4983FF"/>
+      <stop offset="1" stop-color="#245DDB"/>
+    </linearGradient>
+    <linearGradient id="ringStroke" x1="34" y1="34" x2="186" y2="186" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8AB1FF"/>
+      <stop offset="0.52" stop-color="#4983FF"/>
+      <stop offset="1" stop-color="#2A64E8"/>
+    </linearGradient>
+    <linearGradient id="boltFill" x1="97" y1="54" x2="143" y2="170" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F6FAFF"/>
+      <stop offset="0.4" stop-color="#DCE8FF"/>
+      <stop offset="1" stop-color="#FFFFFF"/>
+    </linearGradient>
+    <filter id="shadow" x="14" y="14" width="192" height="192" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#2A4FA6" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <g transform="translate(28 28)">
+    <g filter="url(#shadow)">
+      <circle cx="96" cy="92" r="54" fill="url(#coreGlow)"/>
+      <circle cx="96" cy="92" r="74" stroke="url(#ringStroke)" stroke-width="12"/>
+      <circle cx="96" cy="92" r="88" stroke="#4983FF" stroke-opacity="0.16" stroke-width="4"/>
+      <path d="M96 8V26" stroke="#4983FF" stroke-width="10" stroke-linecap="round"/>
+      <path d="M96 158V176" stroke="#4983FF" stroke-width="10" stroke-linecap="round"/>
+      <path d="M12 92H30" stroke="#4983FF" stroke-width="10" stroke-linecap="round"/>
+      <path d="M162 92H180" stroke="#4983FF" stroke-width="10" stroke-linecap="round"/>
+      <path d="M36.6 32.6L49.3 45.3" stroke="#4983FF" stroke-width="10" stroke-linecap="round"/>
+      <path d="M142.7 138.7L155.4 151.4" stroke="#4983FF" stroke-width="10" stroke-linecap="round"/>
+      <path d="M36.6 151.4L49.3 138.7" stroke="#4983FF" stroke-width="10" stroke-linecap="round"/>
+      <path d="M142.7 45.3L155.4 32.6" stroke="#4983FF" stroke-width="10" stroke-linecap="round"/>
+      <path d="M107 34L73 104H101L85 150L131 84H101L107 34Z" fill="url(#boltFill)"/>
+      <path d="M107 34L73 104H101L85 150L131 84H101L107 34Z" stroke="#E8F0FF" stroke-width="4" stroke-linejoin="round"/>
+    </g>
+  </g>
+
+  <g transform="translate(250 69)">
+    <text x="0" y="0" fill="#17326B" font-family="'Avenir Next', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="68" font-weight="700" letter-spacing="-1.8">
+      <tspan>Fusion</tspan><tspan fill="#4983FF">Solar</tspan><tspan>Kai</tspan>
+    </text>
+    <text x="2" y="52" fill="#5B78B8" font-family="'Avenir Next', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="22" font-weight="500" letter-spacing="2.6">
+      SOLAR MONITORING INTEGRATION
+    </text>
+    <path d="M2 78H470" stroke="url(#ringStroke)" stroke-width="4" stroke-linecap="round" opacity="0.4"/>
+  </g>
+</svg>

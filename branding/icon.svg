@@ -1,0 +1,40 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="iconTitle iconDesc">
+  <title id="iconTitle">FusionSolarKai icon</title>
+  <desc id="iconDesc">A blue sun with a lightning bolt at the center.</desc>
+  <defs>
+    <linearGradient id="iconCoreGlow" x1="54" y1="46" x2="198" y2="210" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#78A4FF"/>
+      <stop offset="0.58" stop-color="#4983FF"/>
+      <stop offset="1" stop-color="#245DDB"/>
+    </linearGradient>
+    <linearGradient id="iconRingStroke" x1="50" y1="50" x2="206" y2="206" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8AB1FF"/>
+      <stop offset="0.52" stop-color="#4983FF"/>
+      <stop offset="1" stop-color="#2A64E8"/>
+    </linearGradient>
+    <linearGradient id="iconBoltFill" x1="124" y1="63" x2="163" y2="173" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F6FAFF"/>
+      <stop offset="0.4" stop-color="#DCE8FF"/>
+      <stop offset="1" stop-color="#FFFFFF"/>
+    </linearGradient>
+    <filter id="iconShadow" x="26" y="22" width="204" height="212" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#2A4FA6" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#iconShadow)">
+    <circle cx="128" cy="128" r="58" fill="url(#iconCoreGlow)"/>
+    <circle cx="128" cy="128" r="78" stroke="url(#iconRingStroke)" stroke-width="14"/>
+    <circle cx="128" cy="128" r="94" stroke="#4983FF" stroke-opacity="0.16" stroke-width="4"/>
+    <path d="M128 28V48" stroke="#4983FF" stroke-width="12" stroke-linecap="round"/>
+    <path d="M128 208V228" stroke="#4983FF" stroke-width="12" stroke-linecap="round"/>
+    <path d="M28 128H48" stroke="#4983FF" stroke-width="12" stroke-linecap="round"/>
+    <path d="M208 128H228" stroke="#4983FF" stroke-width="12" stroke-linecap="round"/>
+    <path d="M57.3 57.3L71.4 71.4" stroke="#4983FF" stroke-width="12" stroke-linecap="round"/>
+    <path d="M184.6 184.6L198.7 198.7" stroke="#4983FF" stroke-width="12" stroke-linecap="round"/>
+    <path d="M57.3 198.7L71.4 184.6" stroke="#4983FF" stroke-width="12" stroke-linecap="round"/>
+    <path d="M184.6 71.4L198.7 57.3" stroke="#4983FF" stroke-width="12" stroke-linecap="round"/>
+    <path d="M140 50L103 120H133L116 174L164 99H133L140 50Z" fill="url(#iconBoltFill)"/>
+    <path d="M140 50L103 120H133L116 174L164 99H133L140 50Z" stroke="#E8F0FF" stroke-width="4" stroke-linejoin="round"/>
+  </g>
+</svg>

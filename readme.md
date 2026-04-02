@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="branding/logo.svg" alt="FusionSolarKai" width="480">
+</p>
+
 # FusionSolarKai
 
 A security-focused Home Assistant integration for Huawei FusionSolar systems. Monitor your solar plant, inverters, batteries, power sensors, chargers, and more — directly from the FusionSolar cloud API. No northbound API, OpenAPI, or kiosk URL required.
