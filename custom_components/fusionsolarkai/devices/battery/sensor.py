@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Any, List, Set
+from typing import Dict, Any, List, Optional, Set
 import re
 
 from homeassistant.helpers.update_coordinator import (
@@ -23,6 +23,10 @@ _LOGGER = logging.getLogger(__name__)
 class BatteryDeviceHandler(BaseDeviceHandler):
     """Handler for Battery devices"""
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._known_modules: Optional[List[str]] = None
+
     async def _async_get_data(self) -> Dict[str, Any]:
         async def fetch_battery_data(client):
             # Get battery data
@@ -30,14 +34,28 @@ class BatteryDeviceHandler(BaseDeviceHandler):
                 client.get_battery_status, self.device_id
             )
 
-            # Get module data
+            # Get module data — only query known modules, or discover on first poll
+            module_ids_to_query = (
+                self._known_modules if self._known_modules is not None
+                else ["1", "2", "3", "4"]
+            )
+            discovering = self._known_modules is None
+
             module_data = {}
-            for module_id in ["1", "2", "3", "4"]:
+            for module_id in module_ids_to_query:
                 stats = await self.hass.async_add_executor_job(
                     client.get_battery_module_stats, self.device_id, module_id
                 )
                 if stats:
                     module_data[module_id] = stats
+
+            if discovering:
+                if module_data:
+                    self._known_modules = list(module_data.keys())
+                    _LOGGER.debug(
+                        "Discovered battery modules: %s", self._known_modules
+                    )
+                # If no modules returned data, keep _known_modules as None to retry
 
             try:
                 alarm_data = await self.hass.async_add_executor_job(

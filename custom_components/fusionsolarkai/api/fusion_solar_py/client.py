@@ -178,6 +178,7 @@ def logged_in(func):
             # reset the session
             self._session = requests.Session()
             self._configure_session()
+            self._session_active_cache = (True, time.time())
 
         try:
             result = func(self, *args, **kwargs)
@@ -224,6 +225,8 @@ def with_solver(func):
 
 class FusionSolarClient:
     """The main client to interact with the Fusion Solar API"""
+
+    _SESSION_CACHE_TTL = 30
 
     def __init__(
         self,
@@ -285,6 +288,7 @@ class FusionSolarClient:
         self._captcha_model_path = captcha_model_path
         self.captcha_device = captcha_device
         self._captcha_solver = None
+        self._session_active_cache = (False, 0)
 
         # Only login if no session has been provided. The session should hold the cookies for a logged in state
         if session is None:
@@ -292,6 +296,7 @@ class FusionSolarClient:
 
     def log_out(self):
         """Log out from the FusionSolarAPI"""
+        self._session_active_cache = (False, 0)
         try:
             r = self._session.get(
                 url=f"https://{self._huawei_subdomain}.fusionsolar.huawei.com/unisess/v1/logout",
@@ -434,9 +439,13 @@ class FusionSolarClient:
 
     @with_solver
     def _login(self, allow_captcha_exception=True):
+        self._session_active_cache = (False, 0)
+
         # Use different login flow for INTL subdomain
         if self._is_intl_subdomain():
-            return self._login_intl()
+            self._login_intl()
+            self._session_active_cache = (True, time.time())
+            return
 
         # retrieve the public key in order to test which loging function to use
         key_request = self._session.get(
@@ -586,6 +595,8 @@ class FusionSolarClient:
                 f"Failed to login into FusionSolarAPI: {error}"
             )
 
+        self._session_active_cache = (True, time.time())
+
     def _configure_session(self):
         """Logs into the Fusion Solar API. Raises an exception if the login fails."""
         # check the login credentials right away
@@ -679,6 +690,10 @@ class FusionSolarClient:
         if not self._session:
             return False
 
+        cached_result, cached_timestamp = self._session_active_cache
+        if cached_result and time.time() - cached_timestamp < self._SESSION_CACHE_TTL:
+            return True
+
         try:
             r = self._session.get(
                 f"https://{self._huawei_subdomain}.fusionsolar.huawei.com/rest/dpcloud/auth/v1/is-session-alive"
@@ -687,11 +702,14 @@ class FusionSolarClient:
             response_data = r.json()
         except (requests.exceptions.RequestException, json.JSONDecodeError):
             _LOGGER.debug("Session check failed due to network or parse error", exc_info=True)
+            self._session_active_cache = (False, 0)
             return False
 
         if "code" not in response_data or response_data["code"] != 0:
+            self._session_active_cache = (False, 0)
             return False
         else:
+            self._session_active_cache = (True, time.time())
             return True
 
     @logged_in
