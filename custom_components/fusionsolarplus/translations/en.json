@@ -1,0 +1,52 @@
+{
+  "title": "FusionSolarPlus",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Login to FusionSolar",
+        "description": "# FusionSolarPlus\n\nPlease enter your FusionSolar credentials.\n\n If you wish to control the device, please enable installer access. This is not required if you only want to read data from the device.\n\n ## Disclaimer \n\n If you want to enable installer access please read the disclaimer that can be found [here]({disclaimer_url}).",
+        "data": {
+          "username": "Username",
+          "password": "Password",
+          "subdomain": "Subdomain",
+          "installer": "Enable installer access. By checking this checkbox I confirm that I have read the installer disclaimer."
+        }
+      },
+      "choose_type": {
+        "title": "Device Type",
+        "data": {
+          "device_type": "What would you like to set up?"
+        }
+      },
+      "select_device": {
+        "title": "Select Device",
+        "data": {
+          "device_name": "Please select an device from your account"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Invalid username or password.",
+      "fetch_error": "Failed to fetch devices.",
+      "rate_limit": "Captcha API rate limited, please try again in 24 hours.",
+      "unknown": "Unknown error occurred."
+    },
+    "abort": {
+      "fetch_error": "Could not fetch device list from FusionSolar."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Reconfigure Device",
+        "description": "If you wish to control the device, please enable installer access. This is not required if you only want to read data from the device.\n\n ## Disclaimer \n\n If you want to enable installer access please read the disclaimer that can be found [here]({disclaimer_url}).",
+        "data": {
+          "username": "Username",
+          "password": "Password",
+          "subdomain": "Subdomain",
+          "installer": "Enable installer access. By checking this checkbox I confirm that I have read the installer disclaimer."
+        }
+      }
+    }
+  }
+}

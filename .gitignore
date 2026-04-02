@@ -1,0 +1,12 @@
+.idea/
+
+.ai/
+
+.venv/
+
+.devcontainer/*
+!.devcontainer/devcontainer.sample.json
+
+config/
+*.pyc
+__pycache__/
