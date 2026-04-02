@@ -93,7 +93,7 @@ def generate_entity_list():
     devices = [
         {
             "name": "Inverter",
-            "const_path": "custom_components/fusionsolarplus/devices/inverter/const.py",
+            "const_path": "custom_components/fusionsolarkai/devices/inverter/const.py",
             "arrays": [
                 {"name": "Inverter Signals", "var": "INVERTER_SIGNALS"},
                 {
@@ -107,7 +107,7 @@ def generate_entity_list():
         },
         {
             "name": "Battery",
-            "const_path": "custom_components/fusionsolarplus/devices/battery/const.py",
+            "const_path": "custom_components/fusionsolarkai/devices/battery/const.py",
             "arrays": [
                 {"name": "Battery Status Signals", "var": "BATTERY_STATUS_SIGNALS"},
                 {
@@ -119,7 +119,7 @@ def generate_entity_list():
         },
         {
             "name": "Power Sensor",
-            "const_path": "custom_components/fusionsolarplus/devices/powersensor/const.py",
+            "const_path": "custom_components/fusionsolarkai/devices/powersensor/const.py",
             "arrays": [
                 {"name": "Power Sensor Signals", "var": "POWER_SENSOR_SIGNALS"},
                 {"name": "Emma A02 Signals", "var": "EMMA_A02_SIGNALS"},
@@ -128,7 +128,7 @@ def generate_entity_list():
         },
         {
             "name": "Charger",
-            "const_path": "custom_components/fusionsolarplus/devices/charger/const.py",
+            "const_path": "custom_components/fusionsolarkai/devices/charger/const.py",
             "arrays": [
                 {"name": "Charging Pile Signals", "var": "CHARGING_PILE_SIGNALS"},
                 {"name": "Charger Device Signals", "var": "CHARGER_DEVICE_SIGNALS"},
@@ -136,17 +136,17 @@ def generate_entity_list():
         },
         {
             "name": "Plant",
-            "const_path": "custom_components/fusionsolarplus/devices/plant/const.py",
+            "const_path": "custom_components/fusionsolarkai/devices/plant/const.py",
             "arrays": [{"name": "Plant Signals", "var": "PLANT_SIGNALS"}],
         },
         {
             "name": "BackupBox",
-            "const_path": "custom_components/fusionsolarplus/devices/backupbox/const.py",
+            "const_path": "custom_components/fusionsolarkai/devices/backupbox/const.py",
             "arrays": [{"name": "BackupBox Signals", "var": "BACKUPBOX_SIGNALS"}],
         },
         {
             "name": "EMMA",
-            "const_path": "custom_components/fusionsolarplus/devices/emma/const.py",
+            "const_path": "custom_components/fusionsolarkai/devices/emma/const.py",
             "arrays": [{"name": "EMMA Signals", "var": "EMMA_SIGNALS"}],
         },
     ]

@@ -3,7 +3,7 @@ from functools import partial
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import callback
-from custom_components.fusionsolarplus.const import (
+from custom_components.fusionsolarkai.const import (
     CONF_USERNAME,
     CONF_PASSWORD,
     CONF_SUBDOMAIN,

@@ -1,4 +1,4 @@
-DOMAIN = "fusionsolarplus"
+DOMAIN = "fusionsolarkai"
 
 CONF_USERNAME = "username"
 CONF_PASSWORD = "password"

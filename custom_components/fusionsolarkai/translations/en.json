@@ -1,10 +1,10 @@
 {
-  "title": "FusionSolarPlus",
+  "title": "FusionSolarKai",
   "config": {
     "step": {
       "user": {
         "title": "Login to FusionSolar",
-        "description": "# FusionSolarPlus\n\nPlease enter your FusionSolar credentials.\n\n If you wish to control the device, please enable installer access. This is not required if you only want to read data from the device.\n\n ## Disclaimer \n\n If you want to enable installer access please read the disclaimer that can be found [here]({disclaimer_url}).",
+        "description": "# FusionSolarKai\n\nPlease enter your FusionSolar credentials.\n\n If you wish to control the device, please enable installer access. This is not required if you only want to read data from the device.\n\n ## Disclaimer \n\n If you want to enable installer access please read the disclaimer that can be found [here]({disclaimer_url}).",
         "data": {
           "username": "Username",
           "password": "Password",
